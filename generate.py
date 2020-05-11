@@ -1,5 +1,6 @@
 import random
-
+import sys
+import argparse
 
 def generate_initial_game():
     sorted_numbers = []
@@ -34,13 +35,45 @@ def complete_game_numbers(initial_game):
     return all_games
 
 
-def generate_magical_game():
-    initial_numbers = generate_initial_game()
+def generate_magical_game(initial_game):
 
-    return complete_game_numbers(sorted(initial_numbers))
+    if not initial_game:
+        initial_game = generate_initial_game()
 
+    return complete_game_numbers(sorted(initial_game))
+
+def validate_initial_game_parameter(initial_game):
+    game_number_validated = []
+    for game_number in initial_game:
+        game_number = int(game_number)
+
+        if game_number > 25:
+           raise ValueError('The game number need to be lower or equal than 25') 
+
+        if game_number in game_number_validated:
+            raise ValueError('The game number need to be unique: {}'.format(game_number)) 
+            
+        game_number_validated.append(game_number)
+
+def sanitizer_initial_game_parameter(initial_game):
+    return map(int, initial_game)
 
 if __name__ == '__main__':
-    game_results = generate_magical_game()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--initialgame')
+    args = parser.parse_args()
+    
+
+    initial_game = []
+
+    if args.initialgame:
+        initial_game = args.initialgame.split(",")
+
+        validate_initial_game_parameter(initial_game)
+
+        initial_game = sanitizer_initial_game_parameter(initial_game)
+
+    game_results = generate_magical_game(initial_game)
     for game in game_results:
         print(game)
